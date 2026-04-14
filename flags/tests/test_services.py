@@ -124,3 +124,62 @@ def test_rollout_percentage_under_zero_is_treated_as_zero():
     )
 
     assert result is False
+
+
+def test_rollout_percentage_over_100_is_treated_as_100():
+    result = evaluate_flag(
+        flag_enabled=True,
+        rollout_percentage=500,
+        user_identifier="user_123",
+        flag_key="bzflags-test",
+        overrides={}
+    )
+
+    assert result is True
+
+
+def test_empty_user_identifier_returns_false():
+    result = evaluate_flag(
+        flag_enabled=True,
+        rollout_percentage=50,
+        user_identifier="",
+        flag_key="bzflags-test",
+        overrides={}
+    )
+
+    assert result is False
+
+def test_none_user_identifier_returns_false():
+    result = evaluate_flag(
+        flag_enabled=True,
+        rollout_percentage=50,
+        user_identifier=None,
+        flag_key="bzflags-test",
+        overrides={}
+    )
+
+    assert result is False
+
+
+def test_empty_flag_key_returns_false():
+    result = evaluate_flag(
+        flag_enabled=True,
+        rollout_percentage=50,
+        user_identifier="user_123",
+        flag_key="",
+        overrides={}
+    )
+
+    assert result is False
+
+def test_none_flag_key_returns_false():
+    result = evaluate_flag(
+        flag_enabled=True,
+        rollout_percentage=50,
+        user_identifier="user_123",
+        flag_key=None,
+        overrides={}
+    )
+
+    assert result is False
+

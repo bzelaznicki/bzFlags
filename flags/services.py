@@ -8,6 +8,9 @@ def evaluate_flag(
     overrides: dict,
 ) -> bool:
 
+    if not user_identifier or not flag_key: 
+        return False
+
     if user_identifier in overrides: 
         return overrides[user_identifier] 
 

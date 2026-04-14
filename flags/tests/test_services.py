@@ -77,3 +77,50 @@ def test_sticky_rollouts():
     )
 
     assert not result_2 or result_1
+
+
+def test_override_always_returns_true_on_user():
+    user_identifier = "user_123"
+    flag_key = "bzflags-test"
+
+    result = evaluate_flag(
+        flag_enabled=True,
+        rollout_percentage=0,
+        user_identifier=user_identifier,
+        flag_key=flag_key,
+        overrides={
+            user_identifier: True,
+            "user_456": False,
+        }
+    )
+
+    assert result is True
+
+def test_override_always_returns_false_on_user():
+    user_identifier = "user_123"
+    flag_key = "bzflags-test"
+
+    result = evaluate_flag(
+        flag_enabled=True,
+        rollout_percentage=100,
+        user_identifier=user_identifier,
+        flag_key=flag_key,
+        overrides={
+            user_identifier: False,
+            "user_456": False,
+        }
+    )
+
+    assert result is False 
+
+
+def test_rollout_percentage_under_zero_is_treated_as_zero():
+    result = evaluate_flag(
+        flag_enabled=True,
+        rollout_percentage=-100,
+        user_identifier="user_123",
+        flag_key="bzflags-test",
+        overrides={}
+    )
+
+    assert result is False

@@ -42,3 +42,20 @@ def test_api_should_return_existing_flag():
 
     assert res.status_code == 200
     assert 'bzflags-test' in res.data
+
+
+@pytest.mark.django_db
+def test_api_overrides_should_return_for_user_identifier():
+    project = baker.make('flags.Project')
+    flag = baker.make('flags.Flag', project=project, enabled=True, rollout_percentage=0)
+    override = baker.make('flags.FlagOverride', flag=flag, enabled=True)
+
+
+    client = APIClient()
+    res = client.post('/api/evaluate', data={
+        'user_identifier': override.user_identifier,
+        'flag_keys': [flag.key],
+    }, headers={'X-Api-Key': project.api_key}, format='json')
+
+    assert res.status_code == 200
+    assert res.data[flag.key] == True

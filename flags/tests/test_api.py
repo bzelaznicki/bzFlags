@@ -58,4 +58,4 @@ def test_api_overrides_should_return_for_user_identifier():
     }, headers={'X-Api-Key': project.api_key}, format='json')
 
     assert res.status_code == 200
-    assert res.data[flag.key] == True
+    assert res.data[flag.key] 

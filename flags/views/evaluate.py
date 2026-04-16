@@ -2,8 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.serializers import Serializer, CharField, ListField
-from .models import Project, Flag, FlagOverride
-from .services import evaluate_flag
+from ..models import Project, Flag, FlagOverride
+from ..services import evaluate_flag
 
 # Create your views here.
 

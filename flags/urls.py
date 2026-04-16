@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import EvaluateView
+from .views.evaluate import EvaluateView
 
 
 urlpatterns = [

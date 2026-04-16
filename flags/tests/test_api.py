@@ -32,7 +32,7 @@ def test_api_should_not_return_non_existing_keys():
 @pytest.mark.django_db
 def test_api_should_return_existing_flag():
     project = baker.make('flags.Project')
-    baker.make('flags.Flag', project=project, key='bzflags-test')
+    baker.make('flags.Flag', project=project, key='bzflags-test', enabled=True, rollout_percentage=100)
 
     client = APIClient()
     res = client.post('/api/evaluate', data={

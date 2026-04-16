@@ -34,3 +34,15 @@ def test_api_admin_key_missing():
 
     assert res.status_code == 401
 
+@pytest.mark.django_db
+def test_api_duplicate_project_name():
+    project = baker.make('flags.Project')
+
+    client = APIClient()
+    res = client.post('/api/projects', data={
+        'name': project.name,
+    }, 
+                      headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY},
+                      format='json')
+
+    assert res.status_code == 409

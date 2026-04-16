@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.serializers import Serializer, CharField, ListField
-from .models import Project, Flag
+from .models import Project, Flag, FlagOverride
 from .services import evaluate_flag
 
 # Create your views here.
@@ -23,18 +23,28 @@ class EvaluateView(APIView):
         serializer = EvaluateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        flags = Flag.objects.filter(key__in=serializer.validated_data["flag_keys"], project=project)  
+        flag_data = serializer.validated_data
+
+        flags = Flag.objects.filter(key__in=flag_data["flag_keys"], project=project)  
             
 
         data = {}
 
         for flag in flags:
+
+            overrides = {}
+            override = FlagOverride.objects.filter(flag=flag, user_identifier=flag_data["user_identifier"]).first()
+            
+            if override:
+                overrides[flag_data["user_identifier"]] = override.enabled
+                
+            
             data[flag.key] = evaluate_flag(
                 flag_enabled=flag.enabled,
                 rollout_percentage=flag.rollout_percentage,
-                user_identifier=serializer.validated_data["user_identifier"],
+                user_identifier=flag_data["user_identifier"],
                 flag_key=flag.key,
-                overrides={})
+                overrides=overrides)
 
 
        

@@ -28,12 +28,20 @@ class EvaluateView(APIView):
         flags = Flag.objects.filter(key__in=flag_data["flag_keys"], project=project)  
             
 
+        flag_ids = [f.id for f in flags]
+        overrides_qs = FlagOverride.objects.filter(
+            flag_id__in=flag_ids,
+            user_identifier=flag_data["user_identifier"]
+        ).select_related('flag')
+        override_by_flag = {o.flag_id: o for o in overrides_qs}
+
         data = {}
+
 
         for flag in flags:
 
             overrides = {}
-            override = FlagOverride.objects.filter(flag=flag, user_identifier=flag_data["user_identifier"]).first()
+            override = override_by_flag.get(flag.id)
             
             if override:
                 overrides[flag_data["user_identifier"]] = override.enabled

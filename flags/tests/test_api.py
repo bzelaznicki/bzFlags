@@ -42,6 +42,7 @@ def test_api_should_return_existing_flag():
 
     assert res.status_code == 200
     assert 'bzflags-test' in res.data
+    assert res.data['bzflags-test'] is True
 
 
 @pytest.mark.django_db
@@ -58,4 +59,4 @@ def test_api_overrides_should_return_for_user_identifier():
     }, headers={'X-Api-Key': project.api_key}, format='json')
 
     assert res.status_code == 200
-    assert res.data[flag.key] 
+    assert res.data[flag.key] is True 

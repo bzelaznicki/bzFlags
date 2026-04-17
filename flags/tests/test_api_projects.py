@@ -99,7 +99,7 @@ def test_api_get_single_project():
     assert res.status_code == 200
     assert project.name == res.data['name']
     assert project.api_key == res.data['api_key']
-    assert project.id == res.data['id']
+    assert str(project.id) == res.data['id']
 
 
 

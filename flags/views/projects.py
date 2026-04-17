@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.serializers import Serializer, CharField, ModelSerializer
 from django.db.utils import IntegrityError
+from django.shortcuts import get_object_or_404
 
 from ..models import Project
 from ..authentication import AdminKeyAuthentication
@@ -15,6 +16,11 @@ class ProjectListSerializer(ModelSerializer):
     class Meta:
         model = Project
         fields = ['id', 'name', 'created_at', 'updated_at']
+
+class ProjectDetailSerializer(ModelSerializer):
+    class Meta:
+        model = Project
+        exclude = []
 
 class ProjectView(APIView):
     authentication_classes = [AdminKeyAuthentication]
@@ -47,4 +53,25 @@ class ProjectView(APIView):
         serializer = ProjectListSerializer(projects, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ProjectDetailView(APIView):
+    authentication_classes = [AdminKeyAuthentication]
+    permission_classes = []
+
+    def get(self, request, *args, **kwargs):
+        project_id = kwargs['id']
         
+        project = get_object_or_404(Project, id=project_id)
+        serializer = ProjectDetailSerializer(project)
+
+        return Response(serializer.data, status=status.HTTP_200_OK) 
+
+    def delete(self, request, *args, **kwargs):
+        project_id = kwargs['id']
+
+        project = get_object_or_404(Project, id=project_id)
+
+
+        project.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

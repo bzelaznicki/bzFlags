@@ -10,7 +10,7 @@ from ..authentication import AdminKeyAuthentication
 
 
 class ProjectSerializer(Serializer):
-    name = CharField()
+    name = CharField(max_length=32)
 
 class ProjectListSerializer(ModelSerializer):
     class Meta:

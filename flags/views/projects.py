@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.serializers import Serializer, CharField
+from rest_framework.serializers import Serializer, CharField, ModelSerializer
 from django.db.utils import IntegrityError
 
 from ..models import Project
@@ -11,6 +11,10 @@ from ..authentication import AdminKeyAuthentication
 class ProjectSerializer(Serializer):
     name = CharField()
 
+class ProjectListSerializer(ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ['id', 'name', 'created_at', 'updated_at']
 
 class ProjectView(APIView):
     authentication_classes = [AdminKeyAuthentication]
@@ -37,3 +41,10 @@ class ProjectView(APIView):
             "created_at": project.created_at,
         }
         return Response(response, status=status.HTTP_201_CREATED)   
+
+    def get(self, request):
+        projects = Project.objects.all()
+        serializer = ProjectListSerializer(projects, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        

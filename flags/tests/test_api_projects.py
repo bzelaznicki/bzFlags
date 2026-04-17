@@ -51,7 +51,7 @@ def test_api_duplicate_project_name():
 
 @pytest.mark.django_db
 def test_api_get_list_of_projects():
-    for i in range(5):
+    for _ in range(5):
         baker.make('flags.Project')
 
     client = APIClient()

@@ -120,9 +120,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-ADMIN_SECRET_KEY = os.environ.get("ADMIN_SECRET_KEY")
+ADMIN_SECRET_KEY = os.getenv("ADMIN_SECRET_KEY")
 if not ADMIN_SECRET_KEY:
-    if DEBUG:
-        ADMIN_SECRET_KEY = 'this-is-a-dev-secret'
-    else:
-        raise ImproperlyConfigured('ADMIN_SECRET_KEY environment variable must be set in production')
+    raise ImproperlyConfigured('ADMIN_SECRET_KEY environment variable must be set')

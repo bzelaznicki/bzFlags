@@ -11,7 +11,7 @@ class AdminKeyAuthentication(BaseAuthentication):
         if not admin_key:
             raise AuthenticationFailed("Missing admin key")
 
-        if admin_key != settings.ADMIN_SECRET_KEY:
+        if not secrets.compare_digest(admin_key, settings.ADMIN_SECRET_KEY):
             raise AuthenticationFailed("Invalid admin key")
 
         return (AnonymousUser(), admin_key)

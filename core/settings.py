@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -119,4 +120,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-ADMIN_SECRET_KEY = os.environ.get("ADMIN_SECRET_KEY", 'this-is-a-dev-secret') 
+ADMIN_SECRET_KEY = os.environ.get("ADMIN_SECRET_KEY")
+if not ADMIN_SECRET_KEY:
+    ADMIN_SECRET_KEY = 'this-is-a-dev-secret'
+else:
+    raise ImproperlyConfigured('§ADMIN_SECRET_KEY environment variable must be set in production')

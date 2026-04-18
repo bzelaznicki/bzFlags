@@ -98,7 +98,6 @@ def test_api_get_single_project():
 
     assert res.status_code == 200
     assert project.name == res.data['name']
-    assert project.api_key == res.data['api_key']
     assert str(project.id) == res.data['id']
 
 
@@ -185,6 +184,56 @@ def test_api_delete_project_does_not_reappear():
 
     res = client.get(f'/api/projects/{project.id}',
                         headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY})
+
+    assert res.status_code == 404
+
+@pytest.mark.django_db
+def test_api_regenerate_project_key_happy_path():
+    project = baker.make('flags.Project')
+    client = APIClient()
+
+    old_api_key = project.api_key
+
+    res = client.post(f'/api/projects/{project.id}/regenerate-key', 
+                      headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY})
+
+    assert res.status_code == 200
+    assert res.data['api_key'] != old_api_key
+
+@pytest.mark.django_db
+def test_api_regenerate_project_key_invalid_auth_token():
+    project = baker.make('flags.Project')
+    client = APIClient()
+    
+    old_api_key = project.api_key
+
+    res = client.post(f'/api/projects/{project.id}/regenerate-key',
+                      headers={'X-Admin-Key': 'a-random-invalid-key'})
+    project.refresh_from_db()
+
+    assert res.status_code == 401
+    assert project.api_key == old_api_key
+
+@pytest.mark.django_db
+def test_api_regenerate_project_key_missing_auth_token():
+    project = baker.make('flags.Project')
+    client = APIClient()
+    
+    old_api_key = project.api_key
+
+    res = client.post(f'/api/projects/{project.id}/regenerate-key')
+
+    project.refresh_from_db()
+
+    assert res.status_code == 401
+    assert project.api_key == old_api_key
+
+@pytest.mark.django_db
+def test_api_regenerate_project_key_project_not_found():
+    client = APIClient()
+
+    res = client.post(f'/api/projects/{uuid.uuid4()}/regenerate-key',
+                      headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY})
 
     assert res.status_code == 404
 

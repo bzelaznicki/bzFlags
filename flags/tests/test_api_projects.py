@@ -4,6 +4,7 @@ from model_bakery import baker
 from django.conf import settings
 import uuid
 
+ADMIN_HEADERS = {"X-Admin-Key": settings.ADMIN_SECRET_KEY}
 
 @pytest.mark.django_db
 def test_api_create_project():
@@ -11,7 +12,7 @@ def test_api_create_project():
     res = client.post('/api/projects', data={
         'name': 'testproject'
     }, 
-                      headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY}
+                      headers=ADMIN_HEADERS
                       , format='json')
 
     assert res.status_code == 201
@@ -43,7 +44,7 @@ def test_api_duplicate_project_name():
     res = client.post('/api/projects', data={
         'name': project.name,
     }, 
-                      headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY},
+                      headers=ADMIN_HEADERS,
                       format='json')
 
     assert res.status_code == 409
@@ -57,7 +58,7 @@ def test_api_get_list_of_projects():
     client = APIClient()
     res = client.get(
                     path='/api/projects',
-                    headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY},
+                    headers=ADMIN_HEADERS,
                     )
 
     assert res.status_code == 200
@@ -67,7 +68,7 @@ def test_api_get_list_of_projects():
 def test_api_empty_list_of_projects():
     client = APIClient()
     res = client.get('/api/projects',
-                     headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY},
+                     headers=ADMIN_HEADERS,
                      )
     assert res.status_code == 200
     assert res.data == []
@@ -94,7 +95,7 @@ def test_api_get_single_project():
     client = APIClient()
 
     res = client.get(f'/api/projects/{project.id}', 
-                     headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY})
+                     headers=ADMIN_HEADERS)
 
     assert res.status_code == 200
     assert project.name == res.data['name']
@@ -107,7 +108,7 @@ def test_api_project_not_found():
     client = APIClient()
 
     res = client.get(f'/api/projects/{uuid.uuid4()}',
-                     headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY})
+                     headers=ADMIN_HEADERS)
 
 
     assert res.status_code == 404
@@ -140,7 +141,7 @@ def test_api_delete_project():
     client = APIClient()
 
     res = client.delete(path=f'/api/projects/{project.id}',
-                        headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY})
+                        headers=ADMIN_HEADERS)
 
     assert res.status_code == 204
 
@@ -149,7 +150,7 @@ def test_api_delete_project_not_found():
     client = APIClient()
 
     res = client.delete(path=f'/api/projects/{uuid.uuid4()}',
-                        headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY})
+                        headers=ADMIN_HEADERS)
 
     assert res.status_code == 404
     
@@ -180,10 +181,10 @@ def test_api_delete_project_does_not_reappear():
     client = APIClient()
 
     client.delete(path=f'/api/projects/{project.id}',
-                  headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY})
+                  headers=ADMIN_HEADERS)
 
     res = client.get(f'/api/projects/{project.id}',
-                        headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY})
+                        headers=ADMIN_HEADERS)
 
     assert res.status_code == 404
 
@@ -195,7 +196,7 @@ def test_api_regenerate_project_key_happy_path():
     old_api_key = project.api_key
 
     res = client.post(f'/api/projects/{project.id}/regenerate-key', 
-                      headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY})
+                      headers=ADMIN_HEADERS)
 
     assert res.status_code == 200
     assert res.data['api_key'] != old_api_key
@@ -233,7 +234,7 @@ def test_api_regenerate_project_key_project_not_found():
     client = APIClient()
 
     res = client.post(f'/api/projects/{uuid.uuid4()}/regenerate-key',
-                      headers={'X-Admin-Key': settings.ADMIN_SECRET_KEY})
+                      headers=ADMIN_HEADERS)
 
     assert res.status_code == 404
 

@@ -35,6 +35,7 @@ class ProjectView(APIView):
     def post(self, request):
         serializer = ProjectSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        name = serializer.validated_data['name']
 
         try:
             project = Project.objects.create(

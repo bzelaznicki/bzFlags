@@ -1,4 +1,5 @@
 from hashlib import sha256
+from .models import Project, generate_api_key
 
 def evaluate_flag(
     flag_enabled: bool,
@@ -28,3 +29,15 @@ def evaluate_flag(
         return False
 
     return True
+
+
+def regenerate_project_api_key(project: Project) -> Project:
+    new_key = generate_api_key()
+
+    project.api_key = new_key
+
+    project.save(update_fields=['api_key'])
+
+    return project
+
+

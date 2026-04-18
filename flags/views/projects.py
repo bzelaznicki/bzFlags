@@ -20,7 +20,7 @@ class ProjectListSerializer(ModelSerializer):
 class ProjectDetailSerializer(ModelSerializer):
     class Meta:
         model = Project
-        exclude = []
+        fields = ['id', 'name', 'created_at', 'updated_at']
 
 class ProjectView(APIView):
     authentication_classes = [AdminKeyAuthentication]

@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 
 from ..models import Project
 from ..authentication import AdminKeyAuthentication
+from ..services import regenerate_project_api_key
 
 
 class ProjectSerializer(Serializer):
@@ -21,6 +22,11 @@ class ProjectDetailSerializer(ModelSerializer):
     class Meta:
         model = Project
         fields = ['id', 'name', 'created_at', 'updated_at']
+
+class RegeneratedApiKeyProjectDetailsSerializer(ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ['id', 'name', 'api_key', 'created_at', 'updated_at']
 
 class ProjectView(APIView):
     authentication_classes = [AdminKeyAuthentication]
@@ -75,3 +81,18 @@ class ProjectDetailView(APIView):
         project.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class RegenerateProjectKeyView(APIView):
+    authentication_classes = [AdminKeyAuthentication]
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        project_id = kwargs['id']
+
+        project = get_object_or_404(Project, id=project_id)
+        
+        project = regenerate_project_api_key(project)
+
+        serializer = RegeneratedApiKeyProjectDetailsSerializer(project)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

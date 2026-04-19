@@ -1,6 +1,6 @@
 from django.db import models
 from uuid import uuid4
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, validate_slug
 
 def generate_api_key():
     return str(uuid4())
@@ -16,7 +16,7 @@ class Project(models.Model):
 class Flag(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    key = models.CharField(max_length=32)
+    key = models.CharField(max_length=32, validators=[validate_slug])
     enabled = models.BooleanField(default=True)
     rollout_percentage = models.IntegerField(validators = [MinValueValidator(0), MaxValueValidator(100)], default= 100)
     created_at = models.DateTimeField(auto_now_add=True)
